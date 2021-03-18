@@ -1,4 +1,88 @@
 package com.experis.hvzbackend.models;
 
+import javax.persistence.*;
+import java.util.Set;
+
+@Entity
+@Table(name = "squads")
 public class Squad {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    private String name;
+
+    @Column(name = "is_human")
+    private boolean isHuman;
+
+    @ManyToOne
+    @JoinColumn(name = "game_id")
+    private Game game;
+
+    @OneToMany(mappedBy = "squad")
+    private Set<Chat> chats;
+
+    @OneToMany(mappedBy = "squad")
+    private Set<SquadMember> squadMembers;
+
+    @OneToMany(mappedBy = "squad")
+    private Set<SquadCheckIn> squadCheckIns;
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isHuman() {
+        return isHuman;
+    }
+
+    public void setHuman(boolean human) {
+        isHuman = human;
+    }
+
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Set<Chat> getChats() {
+        return chats;
+    }
+
+    public void setChats(Set<Chat> chats) {
+        this.chats = chats;
+    }
+
+    public Set<SquadMember> getSquadMembers() {
+        return squadMembers;
+    }
+
+    public void setSquadMembers(Set<SquadMember> squadMembers) {
+        this.squadMembers = squadMembers;
+    }
+
+    public Set<SquadCheckIn> getSquadCheckIns() {
+        return squadCheckIns;
+    }
+
+    public void setSquadCheckIns(Set<SquadCheckIn> squadCheckIns) {
+        this.squadCheckIns = squadCheckIns;
+    }
 }

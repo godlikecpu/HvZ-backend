@@ -4,22 +4,21 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "kills")
-public class Kill {
+@Table(name = "squad_check_ins")
+public class SquadCheckIn {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = "time_of_death")
-    private Date timeOfDeath;
+    @Column(name = "start_time")
+    private Date startTime;
 
-    @Column(name = "story")
-    private String story;
+    @Column(name = "end_time")
+    private Date endTime;
 
-    @Column(name = "latitude")
     private float latitude;
 
-    @Column(name = "longitude")
     private float longitude;
 
     @ManyToOne
@@ -27,12 +26,12 @@ public class Kill {
     private Game game;
 
     @ManyToOne
-    @JoinColumn(name = "killer_id")
-    private Player killer;
+    @JoinColumn(name = "squad_id")
+    private Squad squad;
 
-    @OneToOne
-    @JoinColumn(name = "victim_id")
-    private Player victim;
+    @ManyToOne
+    @JoinColumn(name = "squad_member_id")
+    private SquadMember squadMember;
 
 
     public long getId() {
@@ -43,20 +42,20 @@ public class Kill {
         this.id = id;
     }
 
-    public Date getTimeOfDeath() {
-        return timeOfDeath;
+    public Date getStartTime() {
+        return startTime;
     }
 
-    public void setTimeOfDeath(Date timeOfDeath) {
-        this.timeOfDeath = timeOfDeath;
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
     }
 
-    public String getStory() {
-        return story;
+    public Date getEndTime() {
+        return endTime;
     }
 
-    public void setStory(String story) {
-        this.story = story;
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
     }
 
     public float getLatitude() {
@@ -83,19 +82,19 @@ public class Kill {
         this.game = game;
     }
 
-    public Player getKiller() {
-        return killer;
+    public Squad getSquad() {
+        return squad;
     }
 
-    public void setKiller(Player killer) {
-        this.killer = killer;
+    public void setSquad(Squad squad) {
+        this.squad = squad;
     }
 
-    public Player getVictim() {
-        return victim;
+    public SquadMember getSquadMember() {
+        return squadMember;
     }
 
-    public void setVictim(Player victim) {
-        this.victim = victim;
+    public void setSquadMember(SquadMember squadMember) {
+        this.squadMember = squadMember;
     }
 }

@@ -2,37 +2,31 @@ package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.Game;
 import com.experis.hvzbackend.models.Player;
-import com.experis.hvzbackend.models.Squad;
 import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/players/")
+@RequestMapping("/api/v1/game/{game_id}/player")
 public class PlayerController {
 
     private final PlayerRepository playerRepository;
     private final GameRepository gameRepository;
-
 
     public PlayerController(PlayerRepository playerRepository, GameRepository gameRepository) {
         this.playerRepository = playerRepository;
         this.gameRepository = gameRepository;
     }
 
-    @GetMapping("/game/{game_id}/player")
-    public ResponseEntity<List<Player>> getAllPlayers(@PathVariable Long game_id) {
+    @GetMapping()
+    public ResponseEntity<Set<Player>> getAllPlayers(@PathVariable Long game_id) {
         HttpStatus status;
-        // find all players in a given game
-        // i give you the id for a game
-        //
         Game game = gameRepository.findById(game_id).get();
-        List<Player> players = game.getPlayers();
+        Set<Player> players = game.getPlayers();
         if(players.size() == 0) {
             status = HttpStatus.NO_CONTENT;
         } else {
@@ -41,24 +35,50 @@ public class PlayerController {
         return new ResponseEntity<>(players, status);
     }
 
-    @GetMapping("/game/{game_id}/player/{player_id}")
-    public ResponseEntity<Squad> getPlayer(@PathVariable Long game_id, @PathVariable Long player_id) {
+    @GetMapping("/{player_id}")
+    public ResponseEntity<Player> getPlayer(@PathVariable Long game_id, @PathVariable Long player_id) {
+        HttpStatus status;
+        Player returnPlayer = null;
+        Game game = gameRepository.findById(game_id).get();
+        Set<Player> players = game.getPlayers();
+        for (Player player : players) {
+            if(player.getId() == player_id){
+                returnPlayer = player;
+            }
+        }
+        if(returnPlayer == null) {
+            status = HttpStatus.NO_CONTENT;
+        } else {
+            status = HttpStatus.OK;
+        }
+        return new ResponseEntity<>(returnPlayer, status);
+    }
+
+    @PostMapping()
+    public ResponseEntity<Player> addPlayer(@PathVariable Long game_id, @RequestBody Player player) {
         HttpStatus status;
 
+        //Game game = gameRepository.findById(game_id).get();
+        Player returnPlayer = playerRepository.save(player);
+        status = HttpStatus.CREATED;
+        return new ResponseEntity<>(returnPlayer, status);
     }
 
-    @PostMapping("/game/{game_id}/player")
-    public ResponseEntity<Player> addPlayer(@PathVariable Long game_id, @RequestBody Player player) {
-
-    }
-
-    @PutMapping("/game/{game_id}/player/{player_id}")
+    @PutMapping("/{player_id}")
     public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
 
     }
 
-    @DeleteMapping("/game/{game_id}/player/{player_id}")
+    @DeleteMapping("/{player_id}")
     public ResponseEntity<Player> deletePlayer(@PathVariable Long game_id, @PathVariable Long player_id ) {
+        HttpStatus status;
 
+        if(playerRepository.existsById(player_id)){
+            playerRepository.deleteById(player_id);
+            status = HttpStatus.NO_CONTENT;
+        } else {
+            status = HttpStatus.NOT_FOUND;
+        }
+        return new ResponseEntity<>(null, status);
     }
 }

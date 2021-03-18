@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/game/{game_id}/squad")
 public class SquadController {
     private final SquadRepository squadRepository;
     private final GameController gameController;
@@ -22,7 +22,7 @@ public class SquadController {
         this.gameController = gameController;
     }
 
-    @GetMapping("/game/{game_id}/squad")
+    @GetMapping()
     public ResponseEntity<List<Squad>> getAllSquads(@PathVariable Long game_id) {
         HttpStatus status;
         List<Squad> squads = squadRepository.findAll();
@@ -35,7 +35,7 @@ public class SquadController {
         return new ResponseEntity<>(squads, status);
     }
 
-    @GetMapping("/game/{game_id}/{squad_id}")
+    @GetMapping("/{squad_id}")
     public ResponseEntity<Squad> getSquad(@PathVariable Long game_id, @PathVariable Long squad_id) {
         HttpStatus status;
         Game game = gameController.getGame(game_id);
@@ -49,14 +49,14 @@ public class SquadController {
         }
     }
 
-    @PostMapping("/game/{game_id}/squad")
+    @PostMapping()
     public ResponseEntity<Squad> addSquad(@PathVariable Long game_id, @RequestBody Player player) {
         Squad newSquad = new Squad(String name, )
         HttpStatus status;
 
     }
 
-    @PostMapping("/game/{game_id}/squad/{squad_id}/join")
+    @PostMapping("/{squad_id}/join")
     public ResponseEntity<Squad> joinSquad(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Long player_id) {
         HttpStatus status;
 
@@ -73,13 +73,13 @@ public class SquadController {
         return new ResponseEntity<>(squad, status);
     }
 
-    @PutMapping("/game/{game_id}/squad/{squad_id}")
+    @PutMapping("/{squad_id}")
     public ResponseEntity<> updateSquadObjective(@PathVariable Long game_id, @PathVariable Long squad_id) {
         //Updates a squad object. Accepts appropriate parameters in the request body as
         //application/json. Admin only.
     }
 
-    @DeleteMapping("/game/{game_id}/squad/{squad_id}")
+    @DeleteMapping("/{squad_id}")
     public ResponseEntity<Squad> deleteSquad(@PathVariable Long game_id, @PathVariable Long squad_id) {
         //Delete a squad. Admin only
 
@@ -96,7 +96,7 @@ public class SquadController {
         return new ResponseEntity<>(null, status);
     }
 
-    @GetMapping("/game/{game_id}/squad/{squad_id}/chat")
+    @GetMapping("/{squad_id}/chat")
     public ResponseEntity<List<Chat>> getChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player){
         //Returns a list of chat messages. Optionally accepts appropriate query parameters.
         //The messages returned should take into account the current game state of the player,
@@ -123,7 +123,7 @@ public class SquadController {
 
     }
 
-    @PostMapping("/game/{game_id}/squad/{squad_id}/chat")
+    @PostMapping("/{squad_id}/chat")
     public ResponseEntity<List<String>> sendSquadChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player, @RequestBody Chat chat) {
         //Send a new chat message addressed to a particular squad. Accepts appropriate parameters in the request body as application/json. Only administrators and members
         //of a squad who are still in the appropriate faction may send messages to the squad chat,
@@ -142,7 +142,7 @@ public class SquadController {
             return new ResponseEntity<>(chat, status);
     }
 
-    @GetMapping("/game/{game_id}/squad/{squad_id}/check-in")
+    @GetMapping("/{squad_id}/check-in")
     public ResponseEntity<List<SquadCheckIn>> squadCheckIns(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
         //Get a list of squad check-in markers. Optionally accepts appropriate query parameters.
         //Only administrators and members of a squad who are still in the appropriate faction
@@ -169,7 +169,7 @@ public class SquadController {
         }
     }
 
-    @PostMapping("/game/{game_id}/squad/{squad_id}/check-in")
+    @PostMapping("/{squad_id}/check-in")
     public ResponseEntity<SquadCheckIn> createCheckIn(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody SquadCheckIn checkIn, @RequestBody Player player) {
         //Create a squad checkin. Accepts appropriate parameters in the request body as
         //application/json. Only members of a squad who are still in the appropriate faction may check-in with their squad, i.e. a human who has died should not be able to

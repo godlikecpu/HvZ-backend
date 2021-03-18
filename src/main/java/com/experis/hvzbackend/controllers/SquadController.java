@@ -1,8 +1,7 @@
 package com.experis.hvzbackend.controllers;
 
-import com.experis.hvzbackend.models.Game;
-import com.experis.hvzbackend.models.Player;
-import com.experis.hvzbackend.models.Squad;
+import com.experis.hvzbackend.models.*;
+import com.experis.hvzbackend.repositories.ChatRepository;
 import com.experis.hvzbackend.repositories.SquadRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,22 +9,27 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/squad")
 public class SquadController {
     private final SquadRepository squadRepository;
     private final GameController gameController;
+    private final ChatRepository chatRepository;
 
-    public SquadController(SquadRepository squadRepository, GameController gameController) {
+    public SquadController(SquadRepository squadRepository, GameController gameController, ChatRepository chatRepository) {
         this.squadRepository = squadRepository;
         this.gameController = gameController;
+        this.chatRepository = chatRepository;
     }
 
     @GetMapping()
-    public ResponseEntity<List<Squad>> getAllSquads(@PathVariable Long game_id) {
+    public ResponseEntity<Set<Squad>> getAllSquads(@PathVariable Long game_id) {
         HttpStatus status;
-        List<Squad> squads = squadRepository.findAll();
+        Game game = gameController.getGame(game_id);
+        Set<Squad> squads = game.getSquads();
+
         if(squads.size() == 0) {
             status = HttpStatus.NO_CONTENT;
         } else {
@@ -39,38 +43,60 @@ public class SquadController {
     public ResponseEntity<Squad> getSquad(@PathVariable Long game_id, @PathVariable Long squad_id) {
         HttpStatus status;
         Game game = gameController.getGame(game_id);
-        Squad squad = game.getSquad(squad_id);
-        if(squad != null) {
-            status = HttpStatus.OK;
-            return new ResponseEntity<>(squad, status);
-        } else {
+        Set<Squad> squads = game.getSquads();
+        Squad targetSquad = null;
+
+        for (Squad squad : squads) {
+            if(squad.getId() == squad_id) {
+                targetSquad = squad;
+            }
+        }
+
+        if(targetSquad == null) {
             status = HttpStatus.NO_CONTENT;
             return new ResponseEntity<>(null, status);
         }
+
+        status = HttpStatus.OK;
+        return new ResponseEntity<>(targetSquad, status);
     }
 
     @PostMapping()
     public ResponseEntity<Squad> addSquad(@PathVariable Long game_id, @RequestBody Player player) {
-        Squad newSquad = new Squad(String name, )
+        //Creates a squad object. Accepts appropriate parameters in the request body as
+        //application/json. Should also automatically create a corresponding squad member
+        //object that registers the player as the ranking member of the squad they just created.
+
+        Squad newSquad = new Squad(String name, true, )
         HttpStatus status;
 
     }
 
     @PostMapping("/{squad_id}/join")
-    public ResponseEntity<Squad> joinSquad(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Long player_id) {
+    public ResponseEntity<Squad> joinSquad(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
         HttpStatus status;
 
         Game game = gameController.getGame(game_id);
-        Squad squad = game.getSquad(squad_id);
+        Set<Squad> squads = game.getSquads();
+        Squad targetSquad = null;
 
-        if(squad != null) {
-            squad.addMember(player_id);
-            squadRepository.save(squad);
+        for (Squad squad : squads) {
+            if(squad.getId() == squad_id) {
+                targetSquad = squad;
+            }
+        }
+
+        if(targetSquad != null) {
+            Set<Player> squadMembers = targetSquad.getSquadMembers();
+            squadMembers.add(player);
+            targetSquad.setSquadMembers(squadMembers);
+            squadRepository.save(targetSquad);
             status = HttpStatus.OK;
         } else {
             status = HttpStatus.NO_CONTENT;
+            return new ResponseEntity<>(null, status);
         }
-        return new ResponseEntity<>(squad, status);
+        return new ResponseEntity<>(targetSquad, status);
     }
 
     @PutMapping("/{squad_id}")
@@ -105,7 +131,7 @@ public class SquadController {
 
         HttpStatus status = HttpStatus.NO_CONTENT;
 
-        Chat chats = chatRepository.getAll();
+        Set<Chat> chats = chatRepository.get;
         List<Chat> squadChat = new ArrayList();
 
         for(Chat chat: chats) {
@@ -115,7 +141,7 @@ public class SquadController {
         }
 
         //Only humans squad members can get the chat
-        if(player.is_human) {
+        if(player.isHuman()) {
             return new ResponseEntity<>(squadChat, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
@@ -160,7 +186,7 @@ public class SquadController {
             }
         }
 
-        if(!player.is_human) {
+        if(!player.isHuman()) {
             status = HttpStatus.FORBIDDEN;
             return new ResponseEntity<>(null, status);
         } else {
@@ -177,12 +203,12 @@ public class SquadController {
 
         HttpStatus status;
 
-        if(!player.is_human) {
+        if(!player.isHuman()) {
             status = HttpStatus.FORBIDDEN;
             return new ResponseEntity<>(null, status);
         }
 
-        SquadCheckIn ckeckIn = squadCheckInRepository.save(checkIn);
+        SquadCheckIn checkIn = squadCheckInRepository.save(checkIn);
         status = HttpStatus.OK;
         return new ResponseEntity<>(checkIn, status);
 

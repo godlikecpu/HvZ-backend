@@ -29,7 +29,6 @@ public class Squad {
     @OneToMany(mappedBy = "squad")
     private Set<SquadCheckIn> squadCheckIns;
 
-
     public long getId() {
         return id;
     }

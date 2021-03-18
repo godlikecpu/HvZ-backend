@@ -1,4 +1,8 @@
 package com.experis.hvzbackend.repositories;
 
-public interface MissionRepository {
+
+import com.experis.hvzbackend.models.Mission;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface MissionRepository extends JpaRepository<Mission, Long> {
 }

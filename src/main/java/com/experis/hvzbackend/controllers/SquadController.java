@@ -1,6 +1,8 @@
 package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.*;
+import com.experis.hvzbackend.repositories.GameRepository;
+import com.experis.hvzbackend.repositories.PlayerRepository;
 import com.experis.hvzbackend.repositories.SquadRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +15,14 @@ import java.util.Set;
 @RequestMapping("/api/v1/game/{game_id}/squad")
 public class SquadController {
     private final SquadRepository squadRepository;
+    private final GameRepository gameRepository;
+    private final PlayerRepository playerRepository;
 
-    public SquadController(SquadRepository squadRepository) {
+
+    public SquadController(SquadRepository squadRepository, GameRepository gameRepository, PlayerRepository playerRepository) {
         this.squadRepository = squadRepository;
+        this.gameRepository = gameRepository;
+        this.playerRepository = playerRepository;
     }
 
     @GetMapping()
@@ -50,13 +57,18 @@ public class SquadController {
     }
 
     @PostMapping()
-    public ResponseEntity<Squad> addSquad(@PathVariable Long game_id, @RequestBody Player player) {
+    public ResponseEntity<Squad> addSquad(@PathVariable Long game_id, @RequestBody Player player, @RequestBody String squadName) {
         //Creates a squad object. Accepts appropriate parameters in the request body as
         //application/json. Should also automatically create a corresponding squad member
         //object that registers the player as the ranking member of the squad they just created.
 
-        Squad newSquad = new Squad(String name, true, )
+        //Rank = LEADER
+
         HttpStatus status;
+        Game game = gameRepository.findById(game_id).get();
+
+        SquadMember leader = new SquadMember(Rank.LEADER, game, )
+        Squad newSquad = new Squad(squadName, true, game, )
 
     }
 
@@ -64,14 +76,37 @@ public class SquadController {
     public ResponseEntity<Squad> joinSquad(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
         HttpStatus status;
 
-        Squad squad
+        //Rank = Member
+
+        Squad squad = squadRepository.findById(squad_id).get();
+        Set<SquadMember> members = squad.getSquadMembers();
+
+        if(members.size() == 0) {
+            status = HttpStatus.NO_CONTENT;
+            return new ResponseEntity<>(null, status);
+        }
+
+        Game game = gameRepository.findById(game_id).get();
+        Player squadPlayer = playerRepository.findById(player.getId()).get();
+
+        members.add(new SquadMember(Rank.MEMBER, game, squad, squadPlayer));
+
+        squad.setSquadMembers(members);
+
+        squadRepository.save(squad);
+        status = HttpStatus.OK;
+
+        return new ResponseEntity<>(squad, status);
     }
 
+    //Commented out as this endpoint is not a part of the current scope (first sprint)
+    /*
     @PutMapping("/{squad_id}")
     public ResponseEntity<> updateSquadObjective(@PathVariable Long game_id, @PathVariable Long squad_id) {
         //Updates a squad object. Accepts appropriate parameters in the request body as
         //application/json. Admin only.
     }
+    */
 
     @DeleteMapping("/{squad_id}")
     public ResponseEntity<Squad> deleteSquad(@PathVariable Long game_id, @PathVariable Long squad_id) {

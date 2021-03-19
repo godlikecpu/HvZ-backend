@@ -7,6 +7,13 @@ import java.util.Set;
 @Table(name = "squads")
 public class Squad {
 
+    public Squad(String name, boolean isHuman, Game game, Set<SquadMember> squadMembers) {
+        this.name = name;
+        this.isHuman = isHuman;
+        this.game = game;
+        this.squadMembers = squadMembers;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

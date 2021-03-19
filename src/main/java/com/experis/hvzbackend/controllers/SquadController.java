@@ -1,13 +1,11 @@
 package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.*;
-import com.experis.hvzbackend.repositories.ChatRepository;
 import com.experis.hvzbackend.repositories.SquadRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,50 +13,40 @@ import java.util.Set;
 @RequestMapping("/api/v1/game/{game_id}/squad")
 public class SquadController {
     private final SquadRepository squadRepository;
-    private final GameController gameController;
-    private final ChatRepository chatRepository;
 
-    public SquadController(SquadRepository squadRepository, GameController gameController, ChatRepository chatRepository) {
+    public SquadController(SquadRepository squadRepository) {
         this.squadRepository = squadRepository;
-        this.gameController = gameController;
-        this.chatRepository = chatRepository;
     }
 
     @GetMapping()
-    public ResponseEntity<Set<Squad>> getAllSquads(@PathVariable Long game_id) {
+    public ResponseEntity<List<Squad>> getAllSquads(@PathVariable Long game_id) {
         HttpStatus status;
-        Game game = gameController.getGame(game_id);
-        Set<Squad> squads = game.getSquads();
+        List<Squad> allSquads = squadRepository.findAll();
 
-        if(squads.size() == 0) {
+
+        if(allSquads.size() == 0) {
             status = HttpStatus.NO_CONTENT;
         } else {
             status = HttpStatus.OK;
         }
 
-        return new ResponseEntity<>(squads, status);
+        return new ResponseEntity<>(allSquads, status);
     }
 
     @GetMapping("/{squad_id}")
     public ResponseEntity<Squad> getSquad(@PathVariable Long game_id, @PathVariable Long squad_id) {
         HttpStatus status;
-        Game game = gameController.getGame(game_id);
-        Set<Squad> squads = game.getSquads();
-        Squad targetSquad = null;
 
-        for (Squad squad : squads) {
-            if(squad.getId() == squad_id) {
-                targetSquad = squad;
-            }
-        }
+        Squad squad = squadRepository.findById(squad_id).get();
 
-        if(targetSquad == null) {
+        if(squad != null) {
+            status = HttpStatus.OK;
+        } else {
             status = HttpStatus.NO_CONTENT;
-            return new ResponseEntity<>(null, status);
         }
 
         status = HttpStatus.OK;
-        return new ResponseEntity<>(targetSquad, status);
+        return new ResponseEntity<>(squad, status);
     }
 
     @PostMapping()
@@ -76,27 +64,7 @@ public class SquadController {
     public ResponseEntity<Squad> joinSquad(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
         HttpStatus status;
 
-        Game game = gameController.getGame(game_id);
-        Set<Squad> squads = game.getSquads();
-        Squad targetSquad = null;
-
-        for (Squad squad : squads) {
-            if(squad.getId() == squad_id) {
-                targetSquad = squad;
-            }
-        }
-
-        if(targetSquad != null) {
-            Set<Player> squadMembers = targetSquad.getSquadMembers();
-            squadMembers.add(player);
-            targetSquad.setSquadMembers(squadMembers);
-            squadRepository.save(targetSquad);
-            status = HttpStatus.OK;
-        } else {
-            status = HttpStatus.NO_CONTENT;
-            return new ResponseEntity<>(null, status);
-        }
-        return new ResponseEntity<>(targetSquad, status);
+        Squad squad
     }
 
     @PutMapping("/{squad_id}")
@@ -123,7 +91,7 @@ public class SquadController {
     }
 
     @GetMapping("/{squad_id}/chat")
-    public ResponseEntity<List<Chat>> getChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player){
+    public ResponseEntity<Set<Chat>> getChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player){
         //Returns a list of chat messages. Optionally accepts appropriate query parameters.
         //The messages returned should take into account the current game state of the player,
         //i.e. a human should recieve chat messages addressed to the ”global” (cross-faction chat)
@@ -131,26 +99,22 @@ public class SquadController {
 
         HttpStatus status = HttpStatus.NO_CONTENT;
 
-        Set<Chat> chats = chatRepository.get;
-        List<Chat> squadChat = new ArrayList();
-
-        for(Chat chat: chats) {
-            if(chat.squad_id == squad_id) {
-                squadChat.add(chat);
-            }
+        //Only humans allowed this information
+        if(!player.isHuman()) {
+            status = HttpStatus.FORBIDDEN;
+            return new ResponseEntity<>(null, status);
         }
 
-        //Only humans squad members can get the chat
-        if(player.isHuman()) {
-            return new ResponseEntity<>(squadChat, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-        }
+        Squad squad = squadRepository.findById(squad_id).get();
+        Set<Chat> squadChat = squad.getChats();
+
+        return new ResponseEntity<>(squadChat, HttpStatus.OK);
+
 
     }
 
     @PostMapping("/{squad_id}/chat")
-    public ResponseEntity<List<String>> sendSquadChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player, @RequestBody Chat chat) {
+    public ResponseEntity<Set<Chat>> sendSquadChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player, @RequestBody Chat chat) {
         //Send a new chat message addressed to a particular squad. Accepts appropriate parameters in the request body as application/json. Only administrators and members
         //of a squad who are still in the appropriate faction may send messages to the squad chat,
         //i.e. a human who has died should not be able to continue sending messages to their
@@ -158,18 +122,26 @@ public class SquadController {
 
         HttpStatus status;
 
-        if(!player.is_human) {
+        //Only humans allowed this information
+        if(!player.isHuman()) {
             status = HttpStatus.FORBIDDEN;
             return new ResponseEntity<>(null, status);
-        } else
-            chatRepository.save(chat);
-            status = HttpStatus.OK;
+        }
 
-            return new ResponseEntity<>(chat, status);
+        Squad squad = squadRepository.findById(squad_id).get();
+
+        Set<Chat> squadChat = squad.getChats();
+        squadChat.add(chat);
+        squad.setChats(squadChat);
+
+        squadRepository.save(squad);
+        status = HttpStatus.OK;
+
+        return new ResponseEntity<>(squadChat, status);
     }
 
     @GetMapping("/{squad_id}/check-in")
-    public ResponseEntity<List<SquadCheckIn>> squadCheckIns(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
+    public ResponseEntity<Set<SquadCheckIn>> getSquadCheckIns(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
         //Get a list of squad check-in markers. Optionally accepts appropriate query parameters.
         //Only administrators and members of a squad who are still in the appropriate faction
         //may see squad check-ins, i.e. a human who has died should not be able to access the
@@ -177,15 +149,14 @@ public class SquadController {
 
         HttpStatus status;
 
-        SquadCheckIn allCheckIns = SquadCheckInRepository.findAll();
-        List<SquadCheckIn> squadCheckIns = new ArrayList();
+        Squad squad = squadRepository.findById(squad_id).get();
+        Set<SquadCheckIn> squadCheckIns = null;
 
-        for (SquadCheckIn checkIn: allCheckIns) {
-            if(checkIn.squad_id == squad_id) {
-                squadCheckIns.add(checkIn);
-            }
+        if(squad != null) {
+            squadCheckIns = squad.getSquadCheckIns();
         }
 
+        //Only humans are allowed this information
         if(!player.isHuman()) {
             status = HttpStatus.FORBIDDEN;
             return new ResponseEntity<>(null, status);
@@ -203,12 +174,19 @@ public class SquadController {
 
         HttpStatus status;
 
+        //Only humans allowed to access this information
         if(!player.isHuman()) {
             status = HttpStatus.FORBIDDEN;
             return new ResponseEntity<>(null, status);
         }
 
-        SquadCheckIn checkIn = squadCheckInRepository.save(checkIn);
+        Squad squad = squadRepository.findById(squad_id).get();
+
+        Set<SquadCheckIn> squadCheckIns = squad.getSquadCheckIns();
+        squadCheckIns.add(checkIn);
+        squad.setSquadCheckIns(squadCheckIns);
+
+        squadRepository.save(squad);
         status = HttpStatus.OK;
         return new ResponseEntity<>(checkIn, status);
 

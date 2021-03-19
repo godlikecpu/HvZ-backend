@@ -1,6 +1,7 @@
 package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.Game;
+import com.experis.hvzbackend.models.Mission;
 import com.experis.hvzbackend.models.Player;
 import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.PlayerRepository;
@@ -57,8 +58,6 @@ public class PlayerController {
     @PostMapping()
     public ResponseEntity<Player> addPlayer(@PathVariable Long game_id, @RequestBody Player player) {
         HttpStatus status;
-
-        //Game game = gameRepository.findById(game_id).get();
         Player returnPlayer = playerRepository.save(player);
         status = HttpStatus.CREATED;
         return new ResponseEntity<>(returnPlayer, status);
@@ -66,13 +65,20 @@ public class PlayerController {
 
     @PutMapping("/{player_id}")
     public ResponseEntity<Player> updatePlayer(@RequestBody Player player) {
-
+        HttpStatus status;
+        Player returnPlayer = null;
+        if(playerRepository.existsById(player.getId())){
+            status = HttpStatus.NO_CONTENT;
+            returnPlayer = playerRepository.save(player);
+        } else {
+            status = HttpStatus.NOT_FOUND;
+        }
+        return new ResponseEntity<>(returnPlayer, status);
     }
 
     @DeleteMapping("/{player_id}")
     public ResponseEntity<Player> deletePlayer(@PathVariable Long game_id, @PathVariable Long player_id ) {
         HttpStatus status;
-
         if(playerRepository.existsById(player_id)){
             playerRepository.deleteById(player_id);
             status = HttpStatus.NO_CONTENT;

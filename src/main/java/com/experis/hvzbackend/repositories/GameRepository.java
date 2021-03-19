@@ -1,4 +1,8 @@
 package com.experis.hvzbackend.repositories;
 
-public interface GameRepository {
+import com.experis.hvzbackend.models.Game;
+import com.experis.hvzbackend.models.Kill;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface GameRepository extends JpaRepository<Game, Long> {
 }

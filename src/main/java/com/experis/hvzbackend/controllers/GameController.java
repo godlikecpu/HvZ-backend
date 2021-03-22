@@ -25,7 +25,6 @@ public class GameController {
         this.chatRepository = chatRepository;
     }
 
-
     @GetMapping
     public ResponseEntity<List<Game>> getAllGames() {
         HttpStatus status;
@@ -84,12 +83,10 @@ public class GameController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-
     /*
     * Chat related commands
     * Probably move to own controller file
     */
-
 
     @GetMapping("/{game_id}/chat/global")
     public ResponseEntity<List<Chat>> getGlobalChats(@PathVariable Long game_id) {

@@ -9,8 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 
@@ -41,13 +41,11 @@ public class GameController {
     @GetMapping("/{game_id}")
     public ResponseEntity<Game> getGame(@PathVariable Long game_id) {
         HttpStatus status;
-        Game returnGame;
-        if (gameRepository.existsById(game_id)){
+        Game returnGame = gameRepository.findById(game_id).get();
+        if (returnGame != null){
             status = HttpStatus.OK;
-            returnGame = gameRepository.findById(game_id).get();
         } else {
             status = HttpStatus.NOT_FOUND;
-            returnGame = null;
         }
         return new ResponseEntity<>(returnGame, status);
     }
@@ -68,7 +66,7 @@ public class GameController {
             return new ResponseEntity<>(null, status);
         }
         returnGame = gameRepository.save(game);
-        status = HttpStatus.NO_CONTENT;
+        status = HttpStatus.OK;
         return new ResponseEntity<>(returnGame, status);
     }
 
@@ -87,17 +85,17 @@ public class GameController {
     }
 
 
-
     /*
     * Chat related commands
     * Probably move to own controller file
     */
 
-    @GetMapping("/{game_id}/chat")
-    public ResponseEntity<Set<Chat>> getAllChats(@PathVariable Long game_id) {
+
+    @GetMapping("/{game_id}/chat/global")
+    public ResponseEntity<List<Chat>> getGlobalChats(@PathVariable Long game_id) {
         HttpStatus status;
         Game game = gameRepository.findById(game_id).get();
-        Set<Chat> chats = game.getChats();
+        List<Chat> chats = game.getChats();
         if(chats.size() == 0){
             status = HttpStatus.NO_CONTENT;
         } else {
@@ -106,11 +104,56 @@ public class GameController {
         return new ResponseEntity<>(chats, status);
     }
 
+    @GetMapping("/{game_id}/chat/human")
+    public ResponseEntity<List<Chat>> getHumanChats(@PathVariable Long game_id, @RequestBody Player player) {
+        HttpStatus status;
+        if(!player.isHuman()){
+            status = HttpStatus.FORBIDDEN;
+            return new ResponseEntity<>(null, status);
+        }
+        Game game = gameRepository.findById(game_id).get();
+        List<Chat> chats = game.getChats();
+        List<Chat> humanChat = new ArrayList<>();
+        for (Chat chat:chats) {
+            if(chat.isHumanGlobal()){
+                humanChat.add(chat);
+            }
+        }
+        if(humanChat.size() == 0){
+            status = HttpStatus.NO_CONTENT;
+        } else {
+            status = HttpStatus.OK;
+        }
+        return new ResponseEntity<>(humanChat, status);
+    }
+
+    @GetMapping("/{game_id}/chat/zombie")
+    public ResponseEntity<List<Chat>> getZombieChats(@PathVariable Long game_id, @RequestBody Player player) {
+        HttpStatus status;
+        if(player.isHuman()){
+            status = HttpStatus.FORBIDDEN;
+            return new ResponseEntity<>(null, status);
+        }
+        Game game = gameRepository.findById(game_id).get();
+        List<Chat> chats = game.getChats();
+        List<Chat> zombieChat = new ArrayList<>();
+        for (Chat chat:chats) {
+            if(chat.isZombieGlobal()){
+                zombieChat.add(chat);
+            }
+        }
+        if(zombieChat.size() == 0){
+            status = HttpStatus.NO_CONTENT;
+        } else {
+            status = HttpStatus.OK;
+        }
+        return new ResponseEntity<>(zombieChat, status);
+    }
+
     @PostMapping("/{game_id/chat")
     public ResponseEntity<Chat> sendChat(@RequestBody Chat chat) {
         HttpStatus status = HttpStatus.CREATED;
         Chat returnChat = chatRepository.save(chat);
         return new ResponseEntity<>(returnChat, status);
     }
-
 }

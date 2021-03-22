@@ -1,6 +1,7 @@
 package com.experis.hvzbackend.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -28,7 +29,7 @@ public class Squad {
     private Game game;
 
     @OneToMany(mappedBy = "squad")
-    private Set<Chat> chats;
+    private List<Chat> chats;
 
     @OneToMany(mappedBy = "squad")
     private Set<SquadMember> squadMembers;
@@ -68,11 +69,11 @@ public class Squad {
         this.game = game;
     }
 
-    public Set<Chat> getChats() {
+    public List<Chat> getChats() {
         return chats;
     }
 
-    public void setChats(Set<Chat> chats) {
+    public void setChats(List<Chat> chats) {
         this.chats = chats;
     }
 

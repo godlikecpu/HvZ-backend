@@ -86,31 +86,4 @@ public class GameController {
         return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
     }
 
-
-
-    /*
-    * Chat related commands
-    * Probably move to own controller file
-    */
-
-    @GetMapping("/{game_id}/chat")
-    public ResponseEntity<Set<Chat>> getAllChats(@PathVariable Long game_id) {
-        HttpStatus status;
-        Game game = gameRepository.findById(game_id).get();
-        Set<Chat> chats = game.getChats();
-        if(chats.size() == 0){
-            status = HttpStatus.NO_CONTENT;
-        } else {
-            status = HttpStatus.OK;
-        }
-        return new ResponseEntity<>(chats, status);
-    }
-
-    @PostMapping("/{game_id/chat")
-    public ResponseEntity<Chat> sendChat(@RequestBody Chat chat) {
-        HttpStatus status = HttpStatus.CREATED;
-        Chat returnChat = chatRepository.save(chat);
-        return new ResponseEntity<>(returnChat, status);
-    }
-
 }

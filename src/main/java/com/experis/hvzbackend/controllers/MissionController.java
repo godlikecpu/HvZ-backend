@@ -4,6 +4,7 @@ package com.experis.hvzbackend.controllers;
 import com.experis.hvzbackend.models.Game;
 import com.experis.hvzbackend.models.Mission;
 import com.experis.hvzbackend.models.Player;
+import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.MissionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,54 +20,54 @@ import java.util.Set;
 @RequestMapping("/api/v1/game/{game_id}/mission")
 public class MissionController {
     private final MissionRepository missionRepository;
-    private final GameController gameController;
+    private final GameRepository gameRepository;
 
-    public MissionController(MissionRepository missionRepository, GameController gameController) {
+    public MissionController(MissionRepository missionRepository, GameRepository gameRepository) {
         this.missionRepository = missionRepository;
-        this.gameController = gameController;
+        this.gameRepository = gameRepository;
     }
 
     @GetMapping
-    public ResponseEntity<List<Mission>> getAllMission(@PathVariable Long game_id, @RequestBody Player player) {
+    public ResponseEntity<Set<Mission>> getAllMission(@PathVariable Long game_id, @RequestBody Player player) {
         HttpStatus status;
-        ResponseEntity<Game> game = gameController.getGame(game_id);
-        Set<Mission> allMissions = game.getBody().getMissions();
-        List<Mission> factionMissions = new ArrayList();
-        for(Mission mission : allMissions) {
-            if(mission.isHumanVisible() == player.isHuman()){
-                factionMissions.add(mission);
+        Game game = gameRepository.findById(game_id).get();
+        Set<Mission> allMissions = game.getMissions();
+        Set<Mission> zombieMissions = new HashSet<>();
+        Set<Mission> humanMissions = new HashSet<>();
+        if(allMissions.size() == 0) { return new ResponseEntity<>(null, HttpStatus.NO_CONTENT); }
+        for (Mission mission : allMissions) {
+            if(mission.isHumanVisible()){
+                humanMissions.add(mission);
+            } else {
+                zombieMissions.add(mission);
             }
         }
-        if (factionMissions.size() == 0){
-            status = HttpStatus.NO_CONTENT;
+        boolean playerStatus = player.isHuman();
+        if (playerStatus){
+            status = HttpStatus.OK;
+            return new ResponseEntity<>(humanMissions, status);
         } else {
             status = HttpStatus.OK;
+            return new ResponseEntity<>(zombieMissions, status);
         }
-        return new ResponseEntity<>(factionMissions, status);
-
     }
 
     @GetMapping("/{mission_id}")
     public ResponseEntity<Mission> getMission(@PathVariable Long game_id, @PathVariable Long mission_id, @RequestBody Player player) {
         HttpStatus status;
-        ResponseEntity<Game> game = gameController.getGame(game_id);
-        Set<Mission> allMissions = game.getBody().getMissions();
-        Mission targetMission = null;
-        for (Mission mission : allMissions) {
-            if (mission.getId() == mission_id) {
-                targetMission = mission;
-                break;
-            }
-        }
-        if (targetMission == null) {
+        Mission mission = missionRepository.findById(mission_id).get();
+        if (mission == null) {
             status = HttpStatus.NO_CONTENT;
-        } else if(targetMission != null && (player.isHuman() == targetMission.isHumanVisible())){
+            return new ResponseEntity<>(null, status); // we return so status is not changed
+        } else if(player.isHuman() && mission.isHumanVisible()){
+            status = HttpStatus.OK;
+        } else if(!player.isHuman() && mission.isZombieVisible()){
             status = HttpStatus.OK;
         } else {
             status = HttpStatus.FORBIDDEN;
+            return new ResponseEntity<>(null, status);
         }
-        return new ResponseEntity<>(targetMission,  status);
-
+        return new ResponseEntity<>(mission, status);
     }
 
     @PostMapping

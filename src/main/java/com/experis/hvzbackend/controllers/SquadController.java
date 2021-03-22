@@ -1,6 +1,7 @@
 package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.*;
+import com.experis.hvzbackend.repositories.ChatRepository;
 import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.PlayerRepository;
 import com.experis.hvzbackend.repositories.SquadRepository;
@@ -16,12 +17,14 @@ public class SquadController {
     private final SquadRepository squadRepository;
     private final GameRepository gameRepository;
     private final PlayerRepository playerRepository;
+    private final ChatRepository chatRepository;
 
 
-    public SquadController(SquadRepository squadRepository, GameRepository gameRepository, PlayerRepository playerRepository) {
+    public SquadController(SquadRepository squadRepository, GameRepository gameRepository, PlayerRepository playerRepository, ChatRepository chatRepository) {
         this.squadRepository = squadRepository;
         this.gameRepository = gameRepository;
         this.playerRepository = playerRepository;
+        this.chatRepository = chatRepository;
     }
 
     @GetMapping()
@@ -192,30 +195,32 @@ public class SquadController {
     }
 
     @PostMapping("/{squad_id}/chat")
-    public ResponseEntity<List<Chat>> sendSquadChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player, @RequestBody Chat chat) {
+    public ResponseEntity<Chat> sendSquadChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player, @RequestBody Chat chat) {
         //Send a new chat message addressed to a particular squad. Accepts appropriate parameters in the request body as application/json. Only administrators and members
         //of a squad who are still in the appropriate faction may send messages to the squad chat,
         //i.e. a human who has died should not be able to continue sending messages to their
         //human squad; in this event it returns 403 Forbidden.
 
         HttpStatus status;
-
-        //Only humans allowed this information
-        if(!player.isHuman()) {
-            status = HttpStatus.FORBIDDEN;
-            return new ResponseEntity<>(null, status);
+        Squad squad = squadRepository.findById(squad_id).get();
+        Set<SquadMember> squadMembers = squad.getSquadMembers();
+        boolean isMember = false;
+        for (SquadMember squadMember: squadMembers) {
+            if(squadMember.getPlayer().getId() == player.getId()){
+                isMember = true;
+                break;
+            }
         }
 
-        Squad squad = squadRepository.findById(squad_id).get();
-
-        List<Chat> squadChat = squad.getChats();
-        squadChat.add(chat);
-        squad.setChats(squadChat);
-
-        squadRepository.save(squad);
-        status = HttpStatus.OK;
-
-        return new ResponseEntity<>(squadChat, status);
+        if(isMember){
+            if(player.isHuman() == squad.isHuman() ){
+                chat = chatRepository.save(chat);
+                status = HttpStatus.OK;
+                return new ResponseEntity<>(chat, status);
+            }
+        }
+        status = HttpStatus.FORBIDDEN;
+        return new ResponseEntity<>(null, status);
     }
 
     @GetMapping("/{squad_id}/check-in")
@@ -226,22 +231,28 @@ public class SquadController {
         //check-ins of their human squad; in this event it returns 403 Forbidden
 
         HttpStatus status;
-
         Squad squad = squadRepository.findById(squad_id).get();
-        Set<SquadCheckIn> squadCheckIns = null;
-
-        if(squad != null) {
-            squadCheckIns = squad.getSquadCheckIns();
+        Set<SquadMember> squadMembers = squad.getSquadMembers();
+        boolean isMember = false;
+        for (SquadMember squadMember: squadMembers) {
+            if(squadMember.getPlayer().getId() == player.getId()){
+                isMember = true;
+                break;
+            }
         }
-
-        //Only humans are allowed this information
-        if(!player.isHuman()) {
-            status = HttpStatus.FORBIDDEN;
-            return new ResponseEntity<>(null, status);
-        } else {
-            status = HttpStatus.OK;
-            return new ResponseEntity<>(squadCheckIns, status);
+        Set<SquadCheckIn> squadCheckIns;
+        if(isMember){
+            if(player.isHuman() == squad.isHuman()) {
+                squadCheckIns = squad.getSquadCheckIns();
+                if (squadCheckIns.size() == 0) {
+                    return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+                }
+                status = HttpStatus.OK;
+                return new ResponseEntity<>(squadCheckIns, status);
+            }
         }
+        status = HttpStatus.FORBIDDEN;
+        return new ResponseEntity<>(null, status);
     }
 
     @PostMapping("/{squad_id}/check-in")
@@ -249,25 +260,33 @@ public class SquadController {
         //Create a squad checkin. Accepts appropriate parameters in the request body as
         //application/json. Only members of a squad who are still in the appropriate faction may check-in with their squad, i.e. a human who has died should not be able to
         //access the check-ins of their human squad; in this event it returns 403 Forbidden.
-
         HttpStatus status;
-
-        //Only humans allowed to access this information
-        if(!player.isHuman()) {
-            status = HttpStatus.FORBIDDEN;
-            return new ResponseEntity<>(null, status);
-        }
-
         Squad squad = squadRepository.findById(squad_id).get();
+        Set<SquadMember> squadMembers = squad.getSquadMembers();
+        boolean isMember = false;
+        for (SquadMember squadMember: squadMembers) {
+            if(squadMember.getPlayer().getId() == player.getId()){
+                isMember = true;
+                break;
+            }
+        }
+        Set<SquadCheckIn> squadCheckIns;
+        if(isMember){
+            if(player.isHuman() == squad.isHuman()) {
+                // get a list of squad check-ins
+                squadCheckIns = squad.getSquadCheckIns();
+                // add the new squad check-in to the squadCheckIns list
+                squadCheckIns.add(checkIn);
+                // set the squad check-in list to the local squad object
+                squad.setSquadCheckIns(squadCheckIns);
+                // update entire squad
+                squadRepository.save(squad);
 
-        Set<SquadCheckIn> squadCheckIns = squad.getSquadCheckIns();
-        squadCheckIns.add(checkIn);
-        squad.setSquadCheckIns(squadCheckIns);
-
-        squadRepository.save(squad);
-        status = HttpStatus.OK;
-        return new ResponseEntity<>(checkIn, status);
-
+                status = HttpStatus.OK;
+                return new ResponseEntity<>(checkIn, status);
+            }
+        }
+        status = HttpStatus.FORBIDDEN;
+        return new ResponseEntity<>(null, status);
     }
-
 }

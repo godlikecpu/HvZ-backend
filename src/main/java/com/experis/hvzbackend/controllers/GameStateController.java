@@ -9,10 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/state")
-public class GameStatusController {
+public class GameStateController {
     private final GameRepository gameRepository;
 
-    public GameStatusController(GameRepository gameRepository){
+    public GameStateController(GameRepository gameRepository){
         this.gameRepository = gameRepository;
     }
 
@@ -33,7 +33,7 @@ public class GameStatusController {
     }
 
     @PutMapping
-    public ResponseEntity<Game> updateState(@PathVariable Long game_id, GameState gameState) {
+    public ResponseEntity<Game> updateState(@PathVariable Long game_id, @RequestBody GameState gameState) {
         HttpStatus status;
         Game game;
         if(!gameRepository.existsById(game_id)){

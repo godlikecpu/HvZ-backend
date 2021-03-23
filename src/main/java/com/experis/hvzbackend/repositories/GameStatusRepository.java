@@ -1,4 +1,7 @@
 package com.experis.hvzbackend.repositories;
 
-public interface GameStatusRepository {
+import com.experis.hvzbackend.models.GameState;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface GameStatusRepository extends JpaRepository <GameState, Long> {
 }

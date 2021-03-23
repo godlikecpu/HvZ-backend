@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -23,10 +24,10 @@ public class ChatController {
     }
 
     @GetMapping("/chat")
-    public ResponseEntity<Set<Chat>> getAllChats(@PathVariable Long game_id) {
+    public ResponseEntity<List<Chat>> getAllChats(@PathVariable Long game_id) {
         HttpStatus status;
         Game game = gameRepository.findById(game_id).get();
-        Set<Chat> chats = game.getChats();
+        List<Chat> chats = game.getChats();
         if(chats.size() == 0){
             status = HttpStatus.NO_CONTENT;
         } else {

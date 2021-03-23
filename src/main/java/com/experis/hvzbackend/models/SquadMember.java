@@ -3,13 +3,20 @@ package com.experis.hvzbackend.models;
 import javax.persistence.*;
 import java.util.Set;
 
-enum Rank {
-    LEADER, MEMBER
-}
-
 @Entity
 @Table(name = "squad_members")
 public class SquadMember {
+
+    public SquadMember(Rank rank, Game game, Squad squad, Player player) {
+        this.rank = rank;
+        this.game = game;
+        this.squad = squad;
+        this.player = player;
+    }
+
+    public SquadMember() {
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

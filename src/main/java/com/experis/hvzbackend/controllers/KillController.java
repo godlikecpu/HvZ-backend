@@ -25,7 +25,7 @@ public class KillController {
     @GetMapping()
     public ResponseEntity<Set<Kill>> getAllKills(@PathVariable Long game_id) {
         HttpStatus status;
-        Game game = gameRepository.findById(kill_id).get();
+        Game game = gameRepository.findById(game_id).get();
         Set<Kill> kills = game.getKills();
         if(kills.size() == 0) {
             status = HttpStatus.NO_CONTENT;
@@ -39,7 +39,7 @@ public class KillController {
     public ResponseEntity<Kill> getKill(@PathVariable Long game_id, @PathVariable Long kill_id) {
         HttpStatus status;
         Kill returnKill = null;
-        Game game = gameRepository.findById(kill_id).get();
+        Game game = gameRepository.findById(game_id).get();
         Set<Kill> kills = game.getKills();
         for (Kill kill : kills) {
             if(kill.getId() == kill_id){
@@ -47,7 +47,7 @@ public class KillController {
             }
         }
         if(returnKill == null) {
-            status = HttpStatus.NO_CONTENT;
+            status = HttpStatus.NOT_FOUND;
         } else {
             status = HttpStatus.OK;
         }

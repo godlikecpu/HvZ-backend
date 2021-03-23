@@ -1,11 +1,19 @@
 package com.experis.hvzbackend.models;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Set;
 
 @Entity
 @Table(name = "squads")
 public class Squad {
+
+    public Squad(String name, boolean isHuman, Game game, Set<SquadMember> squadMembers) {
+        this.name = name;
+        this.isHuman = isHuman;
+        this.game = game;
+        this.squadMembers = squadMembers;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,14 +29,13 @@ public class Squad {
     private Game game;
 
     @OneToMany(mappedBy = "squad")
-    private Set<Chat> chats;
+    private List<Chat> chats;
 
     @OneToMany(mappedBy = "squad")
     private Set<SquadMember> squadMembers;
 
     @OneToMany(mappedBy = "squad")
     private Set<SquadCheckIn> squadCheckIns;
-
 
     public long getId() {
         return id;
@@ -62,11 +69,11 @@ public class Squad {
         this.game = game;
     }
 
-    public Set<Chat> getChats() {
+    public List<Chat> getChats() {
         return chats;
     }
 
-    public void setChats(Set<Chat> chats) {
+    public void setChats(List<Chat> chats) {
         this.chats = chats;
     }
 

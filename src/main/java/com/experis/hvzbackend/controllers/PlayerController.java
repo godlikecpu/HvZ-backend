@@ -1,7 +1,6 @@
 package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.Game;
-import com.experis.hvzbackend.models.Mission;
 import com.experis.hvzbackend.models.Player;
 import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.PlayerRepository;
@@ -39,20 +38,13 @@ public class PlayerController {
     @GetMapping("/{player_id}")
     public ResponseEntity<Player> getPlayer(@PathVariable Long game_id, @PathVariable Long player_id) {
         HttpStatus status;
-        Player returnPlayer = null;
-        Game game = gameRepository.findById(game_id).get();
-        Set<Player> players = game.getPlayers();
-        for (Player player : players) {
-            if(player.getId() == player_id){
-                returnPlayer = player;
-            }
-        }
-        if(returnPlayer == null) {
+        Player player = playerRepository.findById(player_id).get();
+        if(player == null) {
             status = HttpStatus.NO_CONTENT;
         } else {
             status = HttpStatus.OK;
         }
-        return new ResponseEntity<>(returnPlayer, status);
+        return new ResponseEntity<>(player, status);
     }
 
     @PostMapping()

@@ -1,6 +1,8 @@
 package com.experis.hvzbackend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -31,6 +33,14 @@ public class Mission {
     @ManyToOne
     @JoinColumn(name = "game_id")
     private Game game;
+
+
+    @JsonGetter("game")
+    public String getJsonGame() {
+        if (game != null)
+            return "/api/v1/game/" + game.getId();
+        return null;
+    }
 
     public long getId() {
         return id;

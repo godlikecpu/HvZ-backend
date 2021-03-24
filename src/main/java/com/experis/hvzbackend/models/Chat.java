@@ -1,5 +1,7 @@
 package com.experis.hvzbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -33,6 +35,27 @@ public class Chat {
     @ManyToOne
     @JoinColumn(name = "squad_id")
     private Squad squad;
+
+    @JsonGetter("game")
+    public String getJsonGame() {
+        if (game != null)
+            return "/api/v1/game/" + game.getId();
+        return null;
+    }
+
+    @JsonGetter("player")
+    public String getJsonPlayer() {
+        if (game != null && player != null)
+            return "/api/v1/game/" + game.getId() + "/player/" + player.getId();
+        return null;
+    }
+
+    @JsonGetter("squad")
+    public String getJsonSquad() {
+        if (game != null && squad != null)
+            return "/api/v1/game/" + game.getId() + "/squad/" + squad.getId();
+        return null;
+    }
 
     public long getId() {
         return id;

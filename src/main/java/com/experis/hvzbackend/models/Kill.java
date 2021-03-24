@@ -1,5 +1,7 @@
 package com.experis.hvzbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -34,6 +36,26 @@ public class Kill {
     @JoinColumn(name = "victim_id")
     private Player victim;
 
+    @JsonGetter("game")
+    public String getJsonGame() {
+        if (game != null)
+            return "/api/v1/game/" + game.getId();
+        return null;
+    }
+
+    @JsonGetter("killer")
+    public String getJsonKiller() {
+        if (killer != null)
+            return "/api/v1/game/" + game.getId() + "/player/" + killer.getId();
+        return null;
+    }
+
+    @JsonGetter("victim")
+    public String getJsonVictim() {
+        if (victim != null)
+            return "/api/v1/game/" + game.getId() + "/player/" + victim.getId();
+        return null;
+    }
 
     public long getId() {
         return id;

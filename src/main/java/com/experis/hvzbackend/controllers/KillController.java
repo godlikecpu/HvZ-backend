@@ -2,8 +2,10 @@ package com.experis.hvzbackend.controllers;
 
 import com.experis.hvzbackend.models.Game;
 import com.experis.hvzbackend.models.Kill;
+import com.experis.hvzbackend.models.Player;
 import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.KillRepository;
+import com.experis.hvzbackend.repositories.PlayerRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,10 +18,12 @@ public class KillController {
 
     private final GameRepository gameRepository;
     private final KillRepository killRepository;
+    private final PlayerRepository playerRepository;
 
-    public KillController(GameRepository gameRepository, KillRepository killRepository) {
+    public KillController(GameRepository gameRepository, KillRepository killRepository, PlayerRepository playerRepository) {
         this.gameRepository = gameRepository;
         this.killRepository = killRepository;
+        this.playerRepository = playerRepository;
     }
 
     @GetMapping()
@@ -57,6 +61,15 @@ public class KillController {
     @PostMapping()
     public ResponseEntity<Kill> addKill(@RequestBody Kill kill) {
         HttpStatus status;
+        //Creates a kill object by looking up the victim
+        // by the specified bite code
+        Player victim = playerRepository.findById(kill.getVictim().getId()).get();
+        Player killer = playerRepository.findById(kill.getKiller().getId()).get();
+        killer.setBiteCode(victim.getBiteCode());
+        victim.setHuman(false);
+        kill.setKiller(killer);
+        kill.setVictim(victim);
+
         Kill returnKill = killRepository.save(kill);
         status = HttpStatus.CREATED;
         return new ResponseEntity<>(returnKill, status);

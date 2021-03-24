@@ -12,6 +12,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/kill")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class KillController {
 
     private final GameRepository gameRepository;

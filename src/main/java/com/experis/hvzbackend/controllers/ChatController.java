@@ -13,6 +13,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/{game_id}")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class ChatController {
 
     private final GameRepository gameRepository;

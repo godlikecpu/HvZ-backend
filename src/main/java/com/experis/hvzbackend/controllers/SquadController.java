@@ -13,6 +13,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/squad")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class SquadController {
     private final SquadRepository squadRepository;
     private final GameRepository gameRepository;
@@ -32,7 +33,7 @@ public class SquadController {
         HttpStatus status;
         Game game = gameRepository.findById(game_id).get();
         Set<Squad> allSquads = game.getSquads();
-        if(allSquads.size() == 0) {
+        if (allSquads.size() == 0) {
             status = HttpStatus.NO_CONTENT;
         } else {
             status = HttpStatus.OK;
@@ -44,7 +45,7 @@ public class SquadController {
     public ResponseEntity<Squad> getSquad(@PathVariable Long game_id, @PathVariable Long squad_id) {
         HttpStatus status;
         Squad squad = squadRepository.findById(squad_id).get();
-        if(squad != null) {
+        if (squad != null) {
             status = HttpStatus.OK;
         } else {
             status = HttpStatus.NO_CONTENT;
@@ -65,14 +66,14 @@ public class SquadController {
         //Getting newly generated squad with ID
         List<Squad> allSquads = squadRepository.findAll();
 
-        for (Squad squad: allSquads) {
-            if(squad.getName() == newSquad.getName()) {
+        for (Squad squad : allSquads) {
+            if (squad.getName() == newSquad.getName()) {
                 newSquad = squad;
                 break;
             }
         }
 
-        if(((Long)newSquad.getId()) ==  null) {
+        if (((Long) newSquad.getId()) == null) {
             status = HttpStatus.NO_CONTENT;
             return new ResponseEntity<>(null, status);
         }
@@ -101,7 +102,7 @@ public class SquadController {
         Squad squad = squadRepository.findById(squad_id).get();
         Set<SquadMember> members = squad.getSquadMembers();
 
-        if(members.size() == 0) {
+        if (members.size() == 0) {
             status = HttpStatus.NO_CONTENT;
             return new ResponseEntity<>(null, status);
         }
@@ -121,11 +122,11 @@ public class SquadController {
 
     @PutMapping("/{squad_id}")
     public ResponseEntity<Squad> updateSquadObjective(@PathVariable Long game_id, @PathVariable Long squad_id,
-                                                 @RequestBody Squad squad) {
+                                                      @RequestBody Squad squad) {
         // Admin only.
         HttpStatus status;
         Squad currentSquad = squadRepository.findById(squad_id).get();
-        if(currentSquad.getId() != squad_id){
+        if (currentSquad.getId() != squad_id) {
             status = HttpStatus.NO_CONTENT;
             return new ResponseEntity<>(null, status);
         }
@@ -142,7 +143,7 @@ public class SquadController {
         //might need a role check to see if caller is admin or not
 
         HttpStatus status;
-        if(squadRepository.existsById(squad_id)) {
+        if (squadRepository.existsById(squad_id)) {
             squadRepository.deleteById(squad_id);
             status = HttpStatus.NO_CONTENT;
         } else {
@@ -153,7 +154,7 @@ public class SquadController {
     }
 
     @GetMapping("/{squad_id}/chat")
-    public ResponseEntity<List<Chat>> getChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player){
+    public ResponseEntity<List<Chat>> getChat(@PathVariable Long game_id, @PathVariable Long squad_id, @RequestBody Player player) {
         //Returns a list of chat messages. Optionally accepts appropriate query parameters.
         //The messages returned should take into account the current game state of the player,
         //i.e. a human should recieve chat messages addressed to the ”global” (cross-faction chat)
@@ -163,8 +164,8 @@ public class SquadController {
         Squad squad = squadRepository.findById(squad_id).get();
         Set<SquadMember> squadMembers = squad.getSquadMembers();
         boolean isMember = false;
-        for (SquadMember squadMember: squadMembers) {
-            if(squadMember.getPlayer().getId() == player.getId()){
+        for (SquadMember squadMember : squadMembers) {
+            if (squadMember.getPlayer().getId() == player.getId()) {
                 isMember = true;
                 break;
             }
@@ -173,19 +174,19 @@ public class SquadController {
         List<Chat> chats = squad.getChats();
         List<Chat> humanChat = new ArrayList<>();
         List<Chat> zombieChat = new ArrayList<>();
-        for (Chat chat:chats) {
-            if(chat.isHumanGlobal()){
+        for (Chat chat : chats) {
+            if (chat.isHumanGlobal()) {
                 humanChat.add(chat);
             }
-            if(chat.isZombieGlobal()){
+            if (chat.isZombieGlobal()) {
                 zombieChat.add(chat);
             }
         }
-        if(isMember){
-            if(player.isHuman() && squad.isHuman()){
+        if (isMember) {
+            if (player.isHuman() && squad.isHuman()) {
                 status = HttpStatus.OK;
                 return new ResponseEntity<>(humanChat, status);
-            } else if(!player.isHuman() && !squad.isHuman()){
+            } else if (!player.isHuman() && !squad.isHuman()) {
                 status = HttpStatus.OK;
                 return new ResponseEntity<>(zombieChat, status);
             }
@@ -205,15 +206,15 @@ public class SquadController {
         Squad squad = squadRepository.findById(squad_id).get();
         Set<SquadMember> squadMembers = squad.getSquadMembers();
         boolean isMember = false;
-        for (SquadMember squadMember: squadMembers) {
-            if(squadMember.getPlayer().getId() == player.getId()){
+        for (SquadMember squadMember : squadMembers) {
+            if (squadMember.getPlayer().getId() == player.getId()) {
                 isMember = true;
                 break;
             }
         }
 
-        if(isMember){
-            if(player.isHuman() == squad.isHuman() ){
+        if (isMember) {
+            if (player.isHuman() == squad.isHuman()) {
                 chat = chatRepository.save(chat);
                 status = HttpStatus.OK;
                 return new ResponseEntity<>(chat, status);
@@ -234,15 +235,15 @@ public class SquadController {
         Squad squad = squadRepository.findById(squad_id).get();
         Set<SquadMember> squadMembers = squad.getSquadMembers();
         boolean isMember = false;
-        for (SquadMember squadMember: squadMembers) {
-            if(squadMember.getPlayer().getId() == player.getId()){
+        for (SquadMember squadMember : squadMembers) {
+            if (squadMember.getPlayer().getId() == player.getId()) {
                 isMember = true;
                 break;
             }
         }
         Set<SquadCheckIn> squadCheckIns;
-        if(isMember){
-            if(player.isHuman() == squad.isHuman()) {
+        if (isMember) {
+            if (player.isHuman() == squad.isHuman()) {
                 squadCheckIns = squad.getSquadCheckIns();
                 if (squadCheckIns.size() == 0) {
                     return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
@@ -264,15 +265,15 @@ public class SquadController {
         Squad squad = squadRepository.findById(squad_id).get();
         Set<SquadMember> squadMembers = squad.getSquadMembers();
         boolean isMember = false;
-        for (SquadMember squadMember: squadMembers) {
-            if(squadMember.getPlayer().getId() == player.getId()){
+        for (SquadMember squadMember : squadMembers) {
+            if (squadMember.getPlayer().getId() == player.getId()) {
                 isMember = true;
                 break;
             }
         }
         Set<SquadCheckIn> squadCheckIns;
-        if(isMember){
-            if(player.isHuman() == squad.isHuman()) {
+        if (isMember) {
+            if (player.isHuman() == squad.isHuman()) {
                 // get a list of squad check-ins
                 squadCheckIns = squad.getSquadCheckIns();
                 // add the new squad check-in to the squadCheckIns list

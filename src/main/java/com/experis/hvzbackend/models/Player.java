@@ -71,7 +71,7 @@ public class Player {
     }
 
     public void setHuman(boolean human) {
-        isHuman = human;
+        this.isHuman = human;
     }
 
     public boolean isPatientZero() {
@@ -79,7 +79,7 @@ public class Player {
     }
 
     public void setPatientZero(boolean patientZero) {
-        isPatientZero = patientZero;
+        this.isPatientZero = patientZero;
     }
 
     public String getBiteCode() {

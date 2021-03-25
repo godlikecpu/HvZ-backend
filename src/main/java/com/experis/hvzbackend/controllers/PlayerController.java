@@ -13,6 +13,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/player")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PlayerController {
 
     private final PlayerRepository playerRepository;

@@ -90,7 +90,7 @@ public class Squad {
     }
 
     public void setHuman(boolean human) {
-        isHuman = human;
+        this.isHuman = human;
     }
 
     public Game getGame() {

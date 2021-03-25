@@ -78,7 +78,7 @@ public class Chat {
     }
 
     public void setHumanGlobal(boolean humanGlobal) {
-        isHumanGlobal = humanGlobal;
+        this.isHumanGlobal = humanGlobal;
     }
 
     public boolean isZombieGlobal() {
@@ -86,7 +86,7 @@ public class Chat {
     }
 
     public void setZombieGlobal(boolean zombieGlobal) {
-        isZombieGlobal = zombieGlobal;
+        this.isZombieGlobal = zombieGlobal;
     }
 
     public Date getChatTime() {

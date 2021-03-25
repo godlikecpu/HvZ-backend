@@ -68,6 +68,7 @@ public class KillController {
         Player killer = playerRepository.findById(kill.getKiller().getId()).get();
         killer.setBiteCode(victim.getBiteCode());
         victim.setHuman(false);
+        victim.setPatientZero(true);
         kill.setKiller(killer);
         kill.setVictim(victim);
 

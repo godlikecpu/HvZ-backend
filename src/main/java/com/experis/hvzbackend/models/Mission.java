@@ -1,6 +1,8 @@
 package com.experis.hvzbackend.models;
 
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -32,6 +34,14 @@ public class Mission {
     @JoinColumn(name = "game_id")
     private Game game;
 
+
+    @JsonGetter("game")
+    public String getJsonGame() {
+        if (game != null)
+            return "/api/v1/game/" + game.getId();
+        return null;
+    }
+
     public long getId() {
         return id;
     }
@@ -53,7 +63,7 @@ public class Mission {
     }
 
     public void setHumanVisible(boolean humanVisible) {
-        isHumanVisible = humanVisible;
+        this.isHumanVisible = humanVisible;
     }
 
     public boolean isZombieVisible() {
@@ -61,7 +71,7 @@ public class Mission {
     }
 
     public void setZombieVisible(boolean zombieVisible) {
-        isZombieVisible = zombieVisible;
+        this.isZombieVisible = zombieVisible;
     }
 
     public String getDescription() {

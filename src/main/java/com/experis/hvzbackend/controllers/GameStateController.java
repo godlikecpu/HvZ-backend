@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/state")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class GameStateController {
     private final GameRepository gameRepository;
 

@@ -4,6 +4,7 @@ import com.experis.hvzbackend.models.Game;
 import com.experis.hvzbackend.models.Player;
 import com.experis.hvzbackend.repositories.GameRepository;
 import com.experis.hvzbackend.repositories.PlayerRepository;
+import com.experis.hvzbackend.util.BiteCodeGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/player")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PlayerController {
 
     private final PlayerRepository playerRepository;
@@ -50,6 +52,8 @@ public class PlayerController {
     @PostMapping()
     public ResponseEntity<Player> addPlayer(@PathVariable Long game_id, @RequestBody Player player) {
         HttpStatus status;
+        String biteCode = BiteCodeGenerator.generateBiteCode();
+        player.setBiteCode(biteCode);
         Player returnPlayer = playerRepository.save(player);
         status = HttpStatus.CREATED;
         return new ResponseEntity<>(returnPlayer, status);

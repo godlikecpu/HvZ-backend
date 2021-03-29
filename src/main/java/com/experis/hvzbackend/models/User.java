@@ -1,5 +1,7 @@
 package com.experis.hvzbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,6 +20,14 @@ public class User {
     @OneToOne
     @JoinColumn(name = "player_id")
     private Player player;
+
+
+    @JsonGetter("player")
+    public String getJsonPlayer() {
+        if (player != null)
+            return "/api/v1/game/" + player.getGame().getId() + "/player/" + player.getId();
+        return null;
+    }
 
 
     public Player getPlayer() {

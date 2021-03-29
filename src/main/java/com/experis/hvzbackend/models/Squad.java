@@ -1,8 +1,11 @@
 package com.experis.hvzbackend.models;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
+
 import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "squads")
@@ -37,6 +40,35 @@ public class Squad {
     @OneToMany(mappedBy = "squad")
     private Set<SquadCheckIn> squadCheckIns;
 
+    @JsonGetter("game")
+    public String getJsonGame() {
+        if (game != null)
+            return "/api/v1/game/" + game.getId();
+        return null;
+    }
+
+    @JsonGetter("chats")
+    public List<String> getJsonChats() {
+        if (chats != null)
+            return chats.stream().map(chat -> "/api/v1/game/" + game.getId() + "/chat/" + chat.getId()).collect(Collectors.toList());
+        return null;
+    }
+
+    @JsonGetter("squadMembers")
+    public Set<String> getJsonSquadMembers() {
+        if (squadMembers != null)
+            return squadMembers.stream().map(squadMember -> "/api/v1/game/" + game.getId() + "/player/" + squadMember.getPlayer().getId()).collect(Collectors.toSet());
+        return null;
+    }
+
+    @JsonGetter("squadCheckIns")
+    public Set<String> getJsonSquadCheckIns() {
+        if (squadCheckIns != null)
+            return squadCheckIns.stream().map(sci -> "/api/v1/game/" + game.getId() + "/squad/" + sci.getSquad().getId() + "/check-in/" + sci.getId()).collect(Collectors.toSet());
+        return null;
+    }
+
+
     public long getId() {
         return id;
     }
@@ -58,7 +90,7 @@ public class Squad {
     }
 
     public void setHuman(boolean human) {
-        isHuman = human;
+        this.isHuman = human;
     }
 
     public Game getGame() {

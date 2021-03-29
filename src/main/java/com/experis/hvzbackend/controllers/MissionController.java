@@ -18,6 +18,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/game/{game_id}/mission")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class MissionController {
     private final MissionRepository missionRepository;
     private final GameRepository gameRepository;

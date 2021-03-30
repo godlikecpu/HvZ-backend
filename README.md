@@ -91,13 +91,10 @@ Link to the RESTful API is [here](https://hvz-backend-v1.herokuapp.com).
 
 ## Developers
 
-Dan Tomicic 
-
-Rasmus Ulrichsen
-
-Alexander Rol
-
-Hunor Vadasz-Perhat
+- Dan Tomicic 
+- Rasmus Ulrichsen
+- Alexander Rol
+- Hunor Vadasz-Perhat
 
 
 

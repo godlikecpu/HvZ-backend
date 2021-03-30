@@ -11,13 +11,11 @@ More about the rules of the game is available at the official website [Humans vs
 
 ## Technology stack 
 
-    Java - version:
-Java
-Spring
-Hibernate
-JPA
-postgresql
-JDBC
+- Java - version 15
+- Spring Boot - version 2.4.3
+- JPA - version 2.4.3
+- Hibernate - version 5.4.28
+- PostgreSQL - version 42.2.18
 
 ## API endpoints
 

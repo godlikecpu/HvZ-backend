@@ -18,6 +18,9 @@ public class Kill {
     @Column(name = "story")
     private String story;
 
+    @Column(name = "bite_code")
+    private String biteCode;
+
     @Column(name = "latitude")
     private float latitude;
 
@@ -55,6 +58,14 @@ public class Kill {
         if (victim != null)
             return "/api/v1/game/" + game.getId() + "/player/" + victim.getId();
         return null;
+    }
+
+    public String getBiteCode() {
+        return biteCode;
+    }
+
+    public void setBiteCode(String biteCode) {
+        this.biteCode = biteCode;
     }
 
     public long getId() {
@@ -113,7 +124,9 @@ public class Kill {
         this.killer = killer;
     }
 
-    public Player getVictim() { return victim; }
+    public Player getVictim() {
+        return victim;
+    }
 
     public void setVictim(Player victim) {
         this.victim = victim;

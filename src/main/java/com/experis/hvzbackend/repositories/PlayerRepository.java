@@ -4,4 +4,5 @@ import com.experis.hvzbackend.models.Player;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlayerRepository extends JpaRepository<Player, Long> {
+    Player findPlayerByBiteCode(String biteCode);
 }

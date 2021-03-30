@@ -1,6 +1,7 @@
 package com.experis.hvzbackend.models;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import javax.persistence.*;
 import java.util.List;
@@ -15,9 +16,11 @@ public class Player {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @JsonProperty(value = "isHuman")
     @Column(name = "is_human")
     private boolean isHuman;
 
+    @JsonProperty(value = "isPatientZero")
     @Column(name = "is_patient_zero")
     private boolean isPatientZero;
 
@@ -70,16 +73,16 @@ public class Player {
         return isHuman;
     }
 
-    public void setHuman(boolean human) {
-        this.isHuman = human;
+    public void setHuman(boolean isHuman) {
+        this.isHuman = isHuman;
     }
 
     public boolean isPatientZero() {
         return isPatientZero;
     }
 
-    public void setPatientZero(boolean patientZero) {
-        this.isPatientZero = patientZero;
+    public void setPatientZero(boolean isPatientZero) {
+        this.isPatientZero = isPatientZero;
     }
 
     public String getBiteCode() {

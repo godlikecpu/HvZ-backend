@@ -32,7 +32,7 @@ public class KillController {
         HttpStatus status;
         Game game = gameRepository.findById(game_id).get();
         Set<Kill> kills = game.getKills();
-        if(kills.size() == 0) {
+        if (kills.size() == 0) {
             status = HttpStatus.NO_CONTENT;
         } else {
             status = HttpStatus.OK;
@@ -47,11 +47,11 @@ public class KillController {
         Game game = gameRepository.findById(game_id).get();
         Set<Kill> kills = game.getKills();
         for (Kill kill : kills) {
-            if(kill.getId() == kill_id){
+            if (kill.getId() == kill_id) {
                 returnKill = kill;
             }
         }
-        if(returnKill == null) {
+        if (returnKill == null) {
             status = HttpStatus.NOT_FOUND;
         } else {
             status = HttpStatus.OK;
@@ -62,26 +62,26 @@ public class KillController {
     @PostMapping()
     public ResponseEntity<Kill> addKill(@RequestBody Kill kill) {
         HttpStatus status;
-        //Creates a kill object by looking up the victim
-        // by the specified bite code
-        Player victim = playerRepository.findById(kill.getVictim().getId()).get();
-        Player killer = playerRepository.findById(kill.getKiller().getId()).get();
-        killer.setBiteCode(victim.getBiteCode());
-        victim.setHuman(false);
-        victim.setPatientZero(true);
-        kill.setKiller(killer);
-        kill.setVictim(victim);
-
-        Kill returnKill = killRepository.save(kill);
-        status = HttpStatus.CREATED;
-        return new ResponseEntity<>(returnKill, status);
+        Player victim = playerRepository.findPlayerByBiteCode(kill.getBiteCode());
+        if (victim != null && victim.isHuman()) {
+            Player killer = playerRepository.findById(kill.getKiller().getId()).get();
+            victim.setHuman(false);
+            kill.setKiller(killer);
+            kill.setVictim(victim);
+            Kill returnKill = killRepository.save(kill);
+            status = HttpStatus.CREATED;
+            return new ResponseEntity<>(returnKill, status);
+        } else {
+            status = HttpStatus.BAD_REQUEST;
+            return new ResponseEntity<>(null, status);
+        }
     }
 
     @PutMapping("/{kill_id}")
     public ResponseEntity<Kill> updateKill(@RequestBody Kill kill) {
         HttpStatus status;
         Kill returnKill = null;
-        if(killRepository.existsById(kill.getId())){
+        if (killRepository.existsById(kill.getId())) {
             status = HttpStatus.NO_CONTENT;
             returnKill = killRepository.save(kill);
         } else {
@@ -91,9 +91,9 @@ public class KillController {
     }
 
     @DeleteMapping("/{kill_id}")
-    public ResponseEntity<Kill> deleteKill(@PathVariable Long game_id, @PathVariable Long kill_id ) {
+    public ResponseEntity<Kill> deleteKill(@PathVariable Long game_id, @PathVariable Long kill_id) {
         HttpStatus status;
-        if(killRepository.existsById(kill_id)){
+        if (killRepository.existsById(kill_id)) {
             killRepository.deleteById(kill_id);
             status = HttpStatus.NO_CONTENT;
         } else {

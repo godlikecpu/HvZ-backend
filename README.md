@@ -32,7 +32,7 @@ More about the rules of the game is available at the official website [Humans vs
 - Keycloak - version 12.0.4
 
 ## Deployment
-The Java Spring RESTful API and the PostgreSQL database are deployed to [Heroku](https://hvz-backend-v1.herokuapp.com).
+The Java Spring RESTful API and the PostgreSQL database are deployed to [Heroku](https://www.heroku.com).
 Link to the RESTful API on Heroku is [here](https://hvz-backend-v1.herokuapp.com).
 
 ## API endpoints

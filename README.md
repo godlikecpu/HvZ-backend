@@ -1,6 +1,7 @@
 # HvZ (Human Vs Zombies)
 
-This repository contains the RESTful API for the web based Java Spring game application. 
+This repository contains the RESTful API for the web based Java Spring game application called HvZ.
+The project is the final case for Experis Academy's accelerated Fullstack Java graduate program. 
 
 ## Game description
 
@@ -11,11 +12,27 @@ More about the rules of the game is available at the official website [Humans vs
 
 ## Technology stack 
 
-- Java - version 15
+<b>Programming language:</b>
+  - Java - version 15
+
+<b>Framework:</b>
 - Spring Boot - version 2.4.3
+
+<b>Data access:</b>
 - JPA - version 2.4.3
+
+<b>ORM:</b>
 - Hibernate - version 5.4.28
+
+<b>Database:</b>
 - PostgreSQL - version 42.2.18
+
+<b>Identity management:</b>
+- Keycloak - version 12.0.4
+
+## Deployment
+The Java Spring RESTful API and the PostgreSQL database are deployed to Heroku.
+Link to the RESTful API is [here](https://hvz-backend-v1.herokuapp.com).
 
 ## API endpoints
 
@@ -81,7 +98,20 @@ More about the rules of the game is available at the official website [Humans vs
 
 </br>
 
+## Identity management
 
+[Keycloack](https://www.keycloak.org) is an open source software product to allow single sign-on with Identity and Access Managementaimed at modern applications and services.
+
+
+## Database diagram
+![HvZ](https://github.com/godlikecpu/HvZ-backend/blob/main/docs/hvzdb.png "HvZ DB diagram")
+
+## Developers
+
+- Dan Tomicic 
+- Rasmus Ulrichsen
+- Alexander Rol
+- Hunor Vadasz-Perhat
 
 
 

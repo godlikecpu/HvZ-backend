@@ -12,11 +12,23 @@ More about the rules of the game is available at the official website [Humans vs
 
 ## Technology stack 
 
+Programming language:
 - Java - version 15
+
+Framework:
 - Spring Boot - version 2.4.3
+
+Data access:
 - JPA - version 2.4.3
+
+ORM:
 - Hibernate - version 5.4.28
+
+Database:
 - PostgreSQL - version 42.2.18
+
+Identity management:
+- Keycloak - version 12.0.4
 
 ## Deployment
 The Java Spring RESTful API and the PostgreSQL database are deployed to Heroku.
@@ -85,6 +97,8 @@ Link to the RESTful API is [here](https://hvz-backend-v1.herokuapp.com).
 |/api/v1/game/{game_id}/squad/{squad_id}/check-in|POST|Create a squad checkin|
 
 </br>
+
+## Identity management
 
 ## Database diagram
 ![HvZ](https://github.com/godlikecpu/HvZ-backend/blob/main/docs/hvzdb.png "HvZ DB diagram")

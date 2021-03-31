@@ -2,6 +2,7 @@
 
 This repository contains the RESTful API for the web based Java Spring game application called HvZ.
 The project is the final case for Experis Academy's accelerated Fullstack Java graduate program. 
+Detailed description of the project can be found [here](https://github.com/godlikecpu/HvZ-backend/blob/main/docs/HvZ%20Case.pdf).
 
 ## Game description
 

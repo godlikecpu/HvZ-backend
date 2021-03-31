@@ -1,3 +1,5 @@
+<img src="https://github.com/godlikecpu/HvZ-frontend/blob/main/docs/screenshots/hvz.png" alt="logo" width="1000"/>
+
 # HvZ (Human Vs Zombies)
 
 This repository contains the RESTful API for the web based Java Spring game application called HvZ.
